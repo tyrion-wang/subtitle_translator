@@ -6,7 +6,6 @@ import os
 from tqdm import tqdm
 from openai import OpenAI
 
-
 # 读取配置文件
 def read_config(config_file='config.ini'):
     config = configparser.ConfigParser()
@@ -36,38 +35,70 @@ def read_config(config_file='config.ini'):
 
     return api_key, input_file, output_file, debug_mode, batch_size
 
-
 # 设置OpenAI API密钥
 def setup_openai(api_key):
     os.environ['OPENAI_API_KEY'] = api_key
 
-
 # 翻译函数
-def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False):
+def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False, max_retries=3):
     if debug_mode:
         # 如果是调试模式，模拟API延迟并返回测试翻译结果
         time.sleep(0.1)  # 模拟延迟
-        # print(f"字幕内容log：{texts}")
         return [f"测试翻译：'{text}'" for text in texts]
     else:
         # 使用新的OpenAI接口进行翻译
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        combined_text = '\n'.join(texts)  # 将多行文本合并为一个字符串
+        combined_text = '<<UNIQUE_SEPARATOR>>'.join(texts)  # 将多行文本合并为一个字符串，使用特殊分隔符
         messages = [
             {"role": "user",
-             "content": f"Translate the following text from {source_language} to {target_language}: {combined_text}"}
+             "content": f"Translate the following text from {source_language} to {target_language}. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Please do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters. They are used to ensure the integrity of the text structure.: {combined_text}"}
         ]
 
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            max_tokens=2000,
-            temperature=0
-        )
-        translated_combined_text = response.choices[0].message.content.strip()
-        translated_texts = translated_combined_text.split('\n')  # 按行拆分翻译结果
-        return translated_texts
+        retry_count = 0
+        while retry_count < max_retries:
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=messages,
+                    max_tokens=8192,
+                    temperature=0.1
+                )
+                translated_combined_text = response.choices[0].message.content.strip()
+                translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')
 
+                # 检查翻译后的行数是否与原始行数一致
+                if len(translated_texts) != len(texts):
+                    raise ValueError("翻译后的行数与原始行数不匹配，可能存在错误。")
+                return translated_texts
+            except openai.error.OpenAIError as e:
+                retry_count += 1
+                print(f"请求超时或API错误，正在进行第 {retry_count} 次重试...")
+
+        # 如果多次重试仍失败，抛出异常
+        print(f"原文: {combined_text}")
+        print(f"翻译结果: {translated_combined_text}")
+        raise ValueError("请求重试多次后仍然失败，翻译后的行数与原始行数不匹配，可能存在错误。")
+        translated_combined_text = response.choices[0].message.content.strip()
+        translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')  # 按特殊分隔符拆分翻译结果
+
+        # 检查翻译后的行数是否与原始行数一致
+        if len(translated_texts) != len(texts):
+            # 如果翻译后的行数不一致，尝试重新翻译
+            print("翻译后的行数与原始行数不匹配，正在重新翻译...")
+            translated_combined_text = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                max_tokens=8192,
+                temperature=0.1
+            ).choices[0].message.content.strip()
+            translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')
+            if len(translated_texts) != len(texts):
+                print(f"原文: {combined_text}")
+                print(f"翻译结果: {translated_combined_text}")
+                raise ValueError("翻译后的行数与原始行数不匹配，可能存在错误。")
+            raise ValueError("翻译后的行数与原始行数不匹配，可能存在错误。")
+
+        return translated_texts
 
 # 读取SRT文件并进行翻译
 def translate_srt(input_file, output_file, batch_size=5, debug_mode=False):
@@ -93,7 +124,6 @@ def translate_srt(input_file, output_file, batch_size=5, debug_mode=False):
     # 写入新的SRT文件
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(srt.compose(translated_subtitles))
-
 
 # 主函数
 if __name__ == "__main__":
