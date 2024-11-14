@@ -32,8 +32,9 @@ def read_config(config_file='config.ini'):
     input_file = config['srt']['input_file']
     output_file = config['srt']['output_file']
     debug_mode = config.getboolean('settings', 'debug_mode')  # 转换为布尔值
+    batch_size = config.getint('settings', 'batch_size')  # 读取批次大小
 
-    return api_key, input_file, output_file, debug_mode
+    return api_key, input_file, output_file, debug_mode, batch_size
 
 
 # 设置OpenAI API密钥
@@ -42,33 +43,34 @@ def setup_openai(api_key):
 
 
 # 翻译函数
-def translate_text(text, source_language='en', target_language='zh', debug_mode=False):
+def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False):
     if debug_mode:
         # 如果是调试模式，模拟API延迟并返回测试翻译结果
         time.sleep(0.1)  # 模拟延迟
-        print(f"字幕内容log：{text}")
-        return f"测试翻译：'{text}'"
+        # print(f"字幕内容log：{texts}")
+        return [f"测试翻译：'{text}'" for text in texts]
     else:
         # 使用新的OpenAI接口进行翻译
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        combined_text = '\n'.join(texts)  # 将多行文本合并为一个字符串
         messages = [
             {"role": "user",
-             "content": f"Translate the following text from {source_language} to {target_language}: {text}"}
+             "content": f"Translate the following text from {source_language} to {target_language}: {combined_text}"}
         ]
 
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=messages,
-            max_tokens=1000,
-            temperature=0.3
+            max_tokens=2000,
+            temperature=0
         )
-        # print(f"===log===：{response}")
-        translated_text = response.choices[0].message.content.strip()
-        return translated_text
+        translated_combined_text = response.choices[0].message.content.strip()
+        translated_texts = translated_combined_text.split('\n')  # 按行拆分翻译结果
+        return translated_texts
 
 
 # 读取SRT文件并进行翻译
-def translate_srt(input_file, output_file, debug_mode=False):
+def translate_srt(input_file, output_file, batch_size=5, debug_mode=False):
     with open(input_file, 'r', encoding='utf-8') as f:
         srt_data = list(srt.parse(f.read()))  # 转为列表，方便后续处理
 
@@ -76,17 +78,17 @@ def translate_srt(input_file, output_file, debug_mode=False):
     translated_subtitles = []
 
     # 使用tqdm来显示进度条
-    for idx, subtitle in enumerate(tqdm(srt_data, desc="翻译进度", total=total_lines, unit="行")):
-        original_text = subtitle.content
-        translated_text = translate_text(original_text, debug_mode=debug_mode)
+    for i in tqdm(range(0, total_lines, batch_size), desc="翻译进度", total=(total_lines // batch_size) + 1, unit="批"):
+        batch = srt_data[i:i + batch_size]  # 取出当前批次的字幕
+        original_texts = [subtitle.content for subtitle in batch]
+        translated_texts = translate_text_batch(original_texts, debug_mode=debug_mode)
 
-        # 生成双语字幕
-        bilingual_text = f"{original_text}\n{translated_text}"
-
-        # 创建新的字幕项
-        translated_subtitle = srt.Subtitle(index=subtitle.index, start=subtitle.start, end=subtitle.end,
-                                           content=bilingual_text)
-        translated_subtitles.append(translated_subtitle)
+        # 创建新的字幕项，生成双语字幕
+        for subtitle, translated_text in zip(batch, translated_texts):
+            bilingual_text = f"{subtitle.content}\n{translated_text}"
+            translated_subtitle = srt.Subtitle(index=subtitle.index, start=subtitle.start, end=subtitle.end,
+                                               content=bilingual_text)
+            translated_subtitles.append(translated_subtitle)
 
     # 写入新的SRT文件
     with open(output_file, 'w', encoding='utf-8') as f:
@@ -96,11 +98,11 @@ def translate_srt(input_file, output_file, debug_mode=False):
 # 主函数
 if __name__ == "__main__":
     # 读取配置文件
-    api_key, input_srt_file, output_srt_file, debug_mode = read_config('config.ini')
+    api_key, input_srt_file, output_srt_file, debug_mode, batch_size = read_config('config.ini')
 
     # 设置OpenAI API密钥
     setup_openai(api_key)
 
     # 调用函数进行字幕翻译
-    translate_srt(input_srt_file, output_srt_file, debug_mode=debug_mode)
+    translate_srt(input_srt_file, output_srt_file, batch_size=batch_size, debug_mode=debug_mode)
     print(f"字幕翻译完成，输出文件：{output_srt_file}")
