@@ -61,7 +61,7 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
                     model="gpt-4o",
                     messages=messages,
                     max_tokens=8192,
-                    temperature=0.1
+                    temperature=0.3
                 )
                 translated_combined_text = response.choices[0].message.content.strip()
                 translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')
