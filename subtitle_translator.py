@@ -39,6 +39,23 @@ def read_config(config_file='config.ini'):
 def setup_openai(api_key):
     os.environ['OPENAI_API_KEY'] = api_key
 
+# 通用的调用OpenAI翻译接口函数
+def call_openai_chat_completion(client, messages, max_tokens=8192, temperature=0.3, max_retries=3):
+    retry_count = 0
+    while retry_count < max_retries:
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature
+            )
+            return response.choices[0].message.content.strip()
+        except openai.error.OpenAIError as e:
+            retry_count += 1
+            print(f"请求超时或API错误，正在进行第 {retry_count} 次重试...")
+    raise ValueError("请求重试多次后仍然失败，可能存在错误。")
+
 # 翻译函数
 def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False, max_retries=3):
     if debug_mode:
@@ -54,50 +71,12 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
              "content": f"Translate the following text from {source_language} to {target_language}. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Please do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters. They are used to ensure the integrity of the text structure.: {combined_text}"}
         ]
 
-        retry_count = 0
-        while retry_count < max_retries:
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-4o",
-                    messages=messages,
-                    max_tokens=8192,
-                    temperature=0.3
-                )
-                translated_combined_text = response.choices[0].message.content.strip()
-                translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')
-
-                # 检查翻译后的行数是否与原始行数一致
-                if len(translated_texts) != len(texts):
-                    raise ValueError("翻译后的行数与原始行数不匹配，可能存在错误。")
-                return translated_texts
-            except openai.error.OpenAIError as e:
-                retry_count += 1
-                print(f"请求超时或API错误，正在进行第 {retry_count} 次重试...")
-
-        # 如果多次重试仍失败，抛出异常
-        print(f"原文: {combined_text}")
-        print(f"翻译结果: {translated_combined_text}")
-        raise ValueError("请求重试多次后仍然失败，翻译后的行数与原始行数不匹配，可能存在错误。")
-        translated_combined_text = response.choices[0].message.content.strip()
-        translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')  # 按特殊分隔符拆分翻译结果
+        translated_combined_text = call_openai_chat_completion(client, messages, max_retries=max_retries)
+        translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')
 
         # 检查翻译后的行数是否与原始行数一致
         if len(translated_texts) != len(texts):
-            # 如果翻译后的行数不一致，尝试重新翻译
-            print("翻译后的行数与原始行数不匹配，正在重新翻译...")
-            translated_combined_text = client.chat.completions.create(
-                model="gpt-4o",
-                messages=messages,
-                max_tokens=8192,
-                temperature=0.1
-            ).choices[0].message.content.strip()
-            translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')
-            if len(translated_texts) != len(texts):
-                print(f"原文: {combined_text}")
-                print(f"翻译结果: {translated_combined_text}")
-                raise ValueError("翻译后的行数与原始行数不匹配，可能存在错误。")
             raise ValueError("翻译后的行数与原始行数不匹配，可能存在错误。")
-
         return translated_texts
 
 # 读取SRT文件并进行翻译
@@ -109,7 +88,7 @@ def translate_srt(input_file, output_file, batch_size=5, debug_mode=False):
     translated_subtitles = []
 
     # 使用tqdm来显示进度条
-    for i in tqdm(range(0, total_lines, batch_size), desc="翻译进度", total=(total_lines // batch_size) + 1, unit="批"):
+    for i in tqdm(range(0, total_lines, batch_size), desc="翻译进度", total=(total_lines + batch_size - 1) // batch_size, unit="批"):
         batch = srt_data[i:i + batch_size]  # 取出当前批次的字幕
         original_texts = [subtitle.content for subtitle in batch]
         translated_texts = translate_text_batch(original_texts, debug_mode=debug_mode)
