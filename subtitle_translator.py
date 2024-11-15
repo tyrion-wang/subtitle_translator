@@ -69,7 +69,7 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
         combined_text = '<<UNIQUE_SEPARATOR>>'.join(texts)  # 将多行文本合并为一个字符串，使用特殊分隔符
         messages = [
             {"role": "user",
-             "content": f"Translate the following text from {source_language} to {target_language}. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Please do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters. They are used to ensure the integrity of the text structure.: {combined_text}"}
+             "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. Ensure the translation preserves the emotional tone of the original and is easy to understand for a general audience. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters, as they are used to ensure the integrity of the text structure.: {combined_text}"}
         ]
 
         translated_combined_text = call_openai_chat_completion(client, messages, model=model, temperature=temperature, max_retries=max_retries)
