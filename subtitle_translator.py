@@ -8,6 +8,7 @@ from openai import OpenAI
 
 # 全局变量，用于控制日志打印
 log_enabled = False
+warning_logs = []  # 存储警告信息
 
 # 读取配置文件
 def read_config(config_file='config.ini'):
@@ -53,6 +54,14 @@ def log(log_text, log_value=None):
         else:
             print(f"{log_text}")
 
+# 保存警告日志到文件
+def save_warnings(input_file):
+    if warning_logs:
+        warning_file = os.path.splitext(input_file)[0] + "__翻译错误警告.txt"
+        with open(warning_file, 'w', encoding='utf-8') as f:
+            for warning in warning_logs:
+                f.write(warning + "\n=================================\n")
+
 # 通用的调用OpenAI翻译接口函数
 def call_openai_chat_completion(client, messages, model, max_tokens=8192, temperature=0.3, max_retries=3):
     retry_count = 0
@@ -97,8 +106,9 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
 
         # 检查翻译后的行数是否与原始行数一致，或者翻译结果是否为空字符串
         if len(translated_texts) != len(texts) or any(not text.strip() for text in translated_texts):
-            log("\n警告：翻译后的行数与原始行数不匹配或翻译结果为空，可能存在错误。\n原始文本：", texts)
-            log("翻译结果：", translated_texts)
+            warning_message = f"警告：翻译后的行数与原始行数不匹配或翻译结果为空，可能存在错误。\n原始文本：{texts}\n翻译结果：{translated_texts}"
+            warning_logs.append(warning_message)
+            log(warning_message)
         return translated_texts
 
 # 读取SRT文件并进行翻译
@@ -157,6 +167,9 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
     # 写入新的单语SRT文件（目标语言）
     with open(output_target_lang_file, 'w', encoding='utf-8') as f:
         f.write(srt.compose(translated_texts_only))
+
+    # 保存警告日志
+    save_warnings(input_file)
 
     return output_bilingual_file, output_target_lang_file
 
