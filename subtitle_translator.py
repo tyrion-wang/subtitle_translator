@@ -80,17 +80,25 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
         # 使用新的OpenAI接口进行翻译
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         combined_text = '<<UNIQUE_SEPARATOR>>'.join(texts)  # 将多行文本合并为一个字符串，使用特殊分隔符
-        messages = [
-            {"role": "user",
-             "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. Ensure the translation preserves the emotional tone of the original and is easy to understand for a general audience. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters, as they are used to ensure the integrity of the text structure.: {combined_text}"}
-        ]
+
+        if '<<UNIQUE_SEPARATOR>>' in combined_text:
+            messages = [
+                {"role": "user",
+                 "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. Ensure the translation preserves the emotional tone of the original and is easy to understand for a general audience. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters. Ensure that each translated segment corresponds exactly to the original segment and that no extra '<<UNIQUE_SEPARATOR>>' characters appear at the end of the translation.: {combined_text}"}
+            ]
+        else:
+            messages = [
+                {"role": "user",
+                 "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. Ensure the translation preserves the emotional tone of the original and is easy to understand for a general audience.: {combined_text}"}
+            ]
 
         translated_combined_text = call_openai_chat_completion(client, messages, model=model, temperature=temperature, max_retries=max_retries)
         translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')
 
-        # 检查翻译后的行数是否与原始行数一致
-        if len(translated_texts) != len(texts):
-            raise ValueError("翻译后的行数与原始行数不匹配，可能存在错误。")
+        # 检查翻译后的行数是否与原始行数一致，或者翻译结果是否为空字符串
+        if len(translated_texts) != len(texts) or any(not text.strip() for text in translated_texts):
+            log("\n警告：翻译后的行数与原始行数不匹配或翻译结果为空，可能存在错误。\n原始文本：", texts)
+            log("翻译结果：", translated_texts)
         return translated_texts
 
 # 读取SRT文件并进行翻译
@@ -102,23 +110,41 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
     translated_subtitles = []
     translated_texts_only = []
 
+    i = 0
     # 使用tqdm来显示进度条
-    for i in tqdm(range(0, total_lines, batch_size), desc="翻译进度", total=(total_lines + batch_size - 1) // batch_size, unit="批"):
-        batch = srt_data[i:i + batch_size]  # 取出当前批次的字幕
-        original_texts = [subtitle.content for subtitle in batch]
-        translated_texts = translate_text_batch(original_texts, source_language=source_language, target_language=target_language, debug_mode=debug_mode, model=model, temperature=temperature)
+    with tqdm(total=total_lines, desc="翻译进度", unit="行") as pbar:
+        while i < total_lines:
+            current_batch = []
+            current_length = 0
 
-        # 创建新的字幕项，生成双语字幕
-        for subtitle, translated_text in zip(batch, translated_texts):
-            bilingual_text = f"{subtitle.content}\n{translated_text}"
-            translated_subtitle = srt.Subtitle(index=subtitle.index, start=subtitle.start, end=subtitle.end,
-                                               content=bilingual_text)
-            translated_subtitles.append(translated_subtitle)
+            # 动态调整batch_size以保证完整的句子
+            while i < total_lines and current_length < batch_size:
+                current_batch.append(srt_data[i])
+                current_length += len(srt_data[i].content.split())  # 根据字幕内容的词数调整
+                i += 1
 
-            # 生成单语字幕内容
-            translated_texts_only_subtitle = srt.Subtitle(index=subtitle.index, start=subtitle.start, end=subtitle.end,
-                                                          content=translated_text)
-            translated_texts_only.append(translated_texts_only_subtitle)
+            # 如果当前批次的最后一句不完整，继续添加直到完整
+            while i < total_lines and not current_batch[-1].content.endswith(('.', '!', '?')):
+                current_batch.append(srt_data[i])
+                current_length += len(srt_data[i].content.split())
+                i += 1
+
+            original_texts = [subtitle.content for subtitle in current_batch]
+            translated_texts = translate_text_batch(original_texts, source_language=source_language, target_language=target_language, debug_mode=debug_mode, model=model, temperature=temperature)
+
+            # 创建新的字幕项，生成双语字幕
+            for subtitle, translated_text in zip(current_batch, translated_texts):
+                bilingual_text = f"{subtitle.content}\n{translated_text}"
+                translated_subtitle = srt.Subtitle(index=subtitle.index, start=subtitle.start, end=subtitle.end,
+                                                   content=bilingual_text)
+                translated_subtitles.append(translated_subtitle)
+
+                # 生成单语字幕内容
+                translated_texts_only_subtitle = srt.Subtitle(index=subtitle.index, start=subtitle.start, end=subtitle.end,
+                                                              content=translated_text)
+                translated_texts_only.append(translated_texts_only_subtitle)
+
+            pbar.update(len(current_batch))
 
     # 生成输出文件名
     output_bilingual_file = os.path.splitext(input_file)[0] + f"_combined_{source_language}_{target_language}.srt"
