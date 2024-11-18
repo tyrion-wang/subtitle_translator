@@ -6,8 +6,12 @@ import os
 from tqdm import tqdm
 from openai import OpenAI
 
+# 全局变量，用于控制日志打印
+log_enabled = False
+
 # 读取配置文件
 def read_config(config_file='config.ini'):
+    global log_enabled
     config = configparser.ConfigParser()
 
     # 获取当前脚本所在的目录，并与配置文件名拼接出配置文件的绝对路径
@@ -18,7 +22,7 @@ def read_config(config_file='config.ini'):
     if not os.path.exists(config_path):
         config['openai'] = {'api_key': 'YOUR_OPENAI_API_KEY', 'model': 'gpt-4o', 'temperature': '0.3'}
         config['srt'] = {'input_file': 'input_file.srt'}
-        config['settings'] = {'debug_mode': 'True', 'batch_size': '5'}
+        config['settings'] = {'debug_mode': 'True', 'batch_size': '5', 'log_enabled': 'True'}
         with open(config_path, 'w', encoding='utf-8') as configfile:
             config.write(configfile)
         print(f"配置文件{config_file}已创建，请填写必要的配置信息后重新运行程序。")
@@ -33,12 +37,21 @@ def read_config(config_file='config.ini'):
     input_file = config['srt']['input_file']
     debug_mode = config.getboolean('settings', 'debug_mode')  # 转换为布尔值
     batch_size = config.getint('settings', 'batch_size')  # 读取批次大小
+    log_enabled = config.getboolean('settings', 'log_enabled')  # 读取日志开关
 
     return api_key, model, temperature, input_file, debug_mode, batch_size
 
 # 设置OpenAI API密钥
 def setup_openai(api_key):
     os.environ['OPENAI_API_KEY'] = api_key
+
+# 日志打印函数
+def log(log_text, log_value=None):
+    if log_enabled:
+        if log_value is not None:
+            print(f"{log_text}{log_value}")
+        else:
+            print(f"{log_text}")
 
 # 通用的调用OpenAI翻译接口函数
 def call_openai_chat_completion(client, messages, model, max_tokens=8192, temperature=0.3, max_retries=3):
@@ -54,7 +67,7 @@ def call_openai_chat_completion(client, messages, model, max_tokens=8192, temper
             return response.choices[0].message.content.strip()
         except openai.error.OpenAIError as e:
             retry_count += 1
-            print(f"请求超时或API错误，正在进行第 {retry_count} 次重试...")
+            log("请求超时或API错误，正在进行第", retry_count)
     raise ValueError("请求重试多次后仍然失败，可能存在错误。")
 
 # 翻译函数
@@ -131,5 +144,5 @@ if __name__ == "__main__":
 
     # 调用函数进行字幕翻译
     output_bilingual_file, output_target_lang_file = translate_srt(input_srt_file, batch_size=batch_size, debug_mode=debug_mode, model=model, temperature=temperature)
-    print(f"双语字幕翻译完成，输出文件：{output_bilingual_file}")
-    print(f"单语字幕翻译完成，输出文件：{output_target_lang_file}")
+    log("双语字幕翻译完成，输出文件：", output_bilingual_file)
+    log("单语字幕翻译完成，输出文件：", output_target_lang_file)
