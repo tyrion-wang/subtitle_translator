@@ -93,7 +93,7 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
         if '<<UNIQUE_SEPARATOR>>' in combined_text:
             messages = [
                 {"role": "user",
-                 "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. Ensure the translation preserves the emotional tone of the original and is easy to understand for a general audience. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters. Ensure that each translated segment corresponds exactly to the original segment and that no extra '<<UNIQUE_SEPARATOR>>' characters appear at the end of the translation.: {combined_text}"}
+                 "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. Ensure the translation preserves the emotional tone of the original and is easy to understand for a general audience. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters. Make sure the number of <<UNIQUE_SEPARATOR>> separators in the translation matches the original. This is important!: {combined_text}"}
             ]
         else:
             messages = [
