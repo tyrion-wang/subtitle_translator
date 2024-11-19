@@ -94,8 +94,16 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
 
         if '<<UNIQUE_SEPARATOR>>' in combined_text:
             messages = [
+                {"role": "system",
+                 "content": f"""You are a translation assistant that translates text in a natural and conversational tone suitable for subtitles. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text, and preserving these markers is of utmost importance. 
+                            Follow these specific guidelines for every translation task:
+                            1. Do not translate, remove, or modify the '<<UNIQUE_SEPARATOR>>' markers in any way.
+                            2. Ensure that the number of '<<UNIQUE_SEPARATOR>>' markers in the translated text matches exactly with the original text.
+                            3. Translate each segment independently, keeping the boundaries defined by the '<<UNIQUE_SEPARATOR>>'.
+                            4. Do not add any additional '<<UNIQUE_SEPARATOR>>' at the end of the translation.
+                            5. Add redundancy where appropriate to ensure that the translated text follows the same sequence as the original text, making sure each part aligns smoothly."""},
                 {"role": "user",
-                 "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Follow these specific guidelines: 1. Do not translate, remove, or modify the '<<UNIQUE_SEPARATOR>>' markers in any way.2. Ensure that the number of '<<UNIQUE_SEPARATOR>>' markers in the translated text matches exactly with the original text.3. Translate each segment independently, keeping the boundaries defined by the '<<UNIQUE_SEPARATOR>>'.4. Do not add any additional '<<UNIQUE_SEPARATOR>>' at the end of the translation.5. Add redundancy where appropriate to ensure that the translated text follows the same sequence as the original text, making sure each part aligns smoothly.The goal is for each translated segment to correspond directly with each original segment, preserving emotional tone and clarity for subtitle usage. Here is the text to translate: {combined_text}"}
+                 "content": f"Translate the following text from {source_language} to {target_language}: {combined_text}"}
             ]
         else:
             messages = [
