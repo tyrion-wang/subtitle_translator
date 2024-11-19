@@ -9,10 +9,11 @@ from openai import OpenAI
 # 全局变量，用于控制日志打印
 log_enabled = False
 warning_logs = []  # 存储警告信息
+empty_line_placeholder = "******"  # 默认替换空行的占位符
 
 # 读取配置文件
 def read_config(config_file='config.ini'):
-    global log_enabled
+    global log_enabled, empty_line_placeholder
     config = configparser.ConfigParser()
 
     # 获取当前脚本所在的目录，并与配置文件名拼接出配置文件的绝对路径
@@ -23,7 +24,7 @@ def read_config(config_file='config.ini'):
     if not os.path.exists(config_path):
         config['openai'] = {'api_key': 'YOUR_OPENAI_API_KEY', 'model': 'gpt-4o', 'temperature': '0.3'}
         config['srt'] = {'input_file': 'input_file.srt'}
-        config['settings'] = {'debug_mode': 'True', 'log_enabled': 'True', 'batch_size': '5'}
+        config['settings'] = {'debug_mode': 'True', 'log_enabled': 'True', 'batch_size': '5', 'empty_line_placeholder': '******'}
         with open(config_path, 'w', encoding='utf-8') as configfile:
             config.write(configfile)
         print(f"配置文件{config_file}已创建，请填写必要的配置信息后重新运行程序。")
@@ -39,6 +40,7 @@ def read_config(config_file='config.ini'):
     debug_mode = config.getboolean('settings', 'debug_mode')  # 转换为布尔值
     log_enabled = config.getboolean('settings', 'log_enabled')  # 读取日志开关
     batch_size = config.getint('settings', 'batch_size')  # 读取批次大小
+    empty_line_placeholder = config['settings'].get('empty_line_placeholder', '******')  # 读取空行占位符
 
     return api_key, model, temperature, input_file, debug_mode, batch_size
 
@@ -93,7 +95,7 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
         if '<<UNIQUE_SEPARATOR>>' in combined_text:
             messages = [
                 {"role": "user",
-                 "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. Ensure the translation preserves the emotional tone of the original and is easy to understand for a general audience. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Do not translate, remove, or modify these '<<UNIQUE_SEPARATOR>>' characters. Make sure the number of <<UNIQUE_SEPARATOR>> separators in the translation matches the original. This is important!: {combined_text}"}
+                 "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text. Follow these specific guidelines: 1. Do not translate, remove, or modify the '<<UNIQUE_SEPARATOR>>' markers in any way.2. Ensure that the number of '<<UNIQUE_SEPARATOR>>' markers in the translated text matches exactly with the original text.3. Translate each segment independently, keeping the boundaries defined by the '<<UNIQUE_SEPARATOR>>'.4. Do not add any additional '<<UNIQUE_SEPARATOR>>' at the end of the translation.5. Add redundancy where appropriate to ensure that the translated text follows the same sequence as the original text, making sure each part aligns smoothly.The goal is for each translated segment to correspond directly with each original segment, preserving emotional tone and clarity for subtitle usage. Here is the text to translate: {combined_text}"}
             ]
         else:
             messages = [
@@ -140,6 +142,13 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
 
             original_texts = [subtitle.content for subtitle in current_batch]
             translated_texts = translate_text_batch(original_texts, source_language=source_language, target_language=target_language, debug_mode=debug_mode, model=model, temperature=temperature)
+
+            # 确保 translated_texts 的数量与 original_texts 一致
+            if len(translated_texts) < len(original_texts):
+                translated_texts.extend([empty_line_placeholder] * (len(original_texts) - len(translated_texts)))
+
+            # 确保 translated_texts 中没有空字符串，将空字符串替换为占位符
+            translated_texts = [text if text.strip() else empty_line_placeholder for text in translated_texts]
 
             # 创建新的字幕项，生成双语字幕
             for subtitle, translated_text in zip(current_batch, translated_texts):
