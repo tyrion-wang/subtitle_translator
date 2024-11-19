@@ -78,6 +78,7 @@ def call_openai_chat_completion(client, messages, model, max_tokens=8192, temper
             return response.choices[0].message.content.strip()
         except openai.OpenAIError as e:
             retry_count += 1
+            log(e)
             log("请求超时或API错误，正在进行第", retry_count)
     raise ValueError("请求重试多次后仍然失败，可能存在错误。")
 
