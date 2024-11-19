@@ -23,7 +23,7 @@ def read_config(config_file='config.ini'):
     if not os.path.exists(config_path):
         config['openai'] = {'api_key': 'YOUR_OPENAI_API_KEY', 'model': 'gpt-4o', 'temperature': '0.3'}
         config['srt'] = {'input_file': 'input_file.srt'}
-        config['settings'] = {'debug_mode': 'True', 'batch_size': '5', 'log_enabled': 'True'}
+        config['settings'] = {'debug_mode': 'True', 'log_enabled': 'True', 'batch_size': '5'}
         with open(config_path, 'w', encoding='utf-8') as configfile:
             config.write(configfile)
         print(f"配置文件{config_file}已创建，请填写必要的配置信息后重新运行程序。")
@@ -37,8 +37,8 @@ def read_config(config_file='config.ini'):
     temperature = config.getfloat('openai', 'temperature')
     input_file = config['srt']['input_file']
     debug_mode = config.getboolean('settings', 'debug_mode')  # 转换为布尔值
-    batch_size = config.getint('settings', 'batch_size')  # 读取批次大小
     log_enabled = config.getboolean('settings', 'log_enabled')  # 读取日志开关
+    batch_size = config.getint('settings', 'batch_size')  # 读取批次大小
 
     return api_key, model, temperature, input_file, debug_mode, batch_size
 
@@ -83,12 +83,12 @@ def call_openai_chat_completion(client, messages, model, max_tokens=8192, temper
 def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False, model='gpt-4o', temperature=0.3, max_retries=3):
     if debug_mode:
         # 如果是调试模式，模拟API延迟并返回测试翻译结果
-        time.sleep(0.01)  # 模拟延迟
+        time.sleep(0.5)  # 模拟延迟
         return [f"测试翻译：'{text}'" for text in texts]
     else:
         # 使用新的OpenAI接口进行翻译
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        combined_text = '<<UNIQUE_SEPARATOR>>'.join(texts)  # 将多行文本合并为一个字符串，使用特殊分隔符
+        combined_text = '<<UNIQUE_SEPARATOR>>'.join(texts)  # 将多行文本合并为一个字符串，使用特殊分割符
 
         if '<<UNIQUE_SEPARATOR>>' in combined_text:
             messages = [
@@ -127,16 +127,15 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
             current_batch = []
             current_length = 0
 
-            # 动态调整batch_size以保证完整的句子
+            # 默认按照batch_size决定一次性提交多少行字幕进行翻译
             while i < total_lines and current_length < batch_size:
                 current_batch.append(srt_data[i])
-                current_length += len(srt_data[i].content.split())  # 根据字幕内容的词数调整
+                current_length += 1
                 i += 1
 
             # 如果当前批次的最后一句不完整，继续添加直到完整
             while i < total_lines and not current_batch[-1].content.endswith(('.', '!', '?')):
                 current_batch.append(srt_data[i])
-                current_length += len(srt_data[i].content.split())
                 i += 1
 
             original_texts = [subtitle.content for subtitle in current_batch]
