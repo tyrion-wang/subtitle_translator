@@ -95,13 +95,15 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
         if '<<UNIQUE_SEPARATOR>>' in combined_text:
             messages = [
                 {"role": "system",
-                 "content": f"""You are a translation assistant that translates text in a natural and conversational tone suitable for subtitles. The '<<UNIQUE_SEPARATOR>>' characters are critical markers for separating different parts of the text, and preserving these markers is of utmost importance. 
-                            Follow these specific guidelines for every translation task:
-                            1. Do not translate, remove, or modify the '<<UNIQUE_SEPARATOR>>' markers in any way.
-                            2. Ensure that the number of '<<UNIQUE_SEPARATOR>>' markers in the translated text matches exactly with the original text.
-                            3. Translate each segment independently, keeping the boundaries defined by the '<<UNIQUE_SEPARATOR>>'.
-                            4. Do not add any additional '<<UNIQUE_SEPARATOR>>' at the end of the translation.
-                            5. Add redundancy where appropriate to ensure that the translated text follows the same sequence as the original text, making sure each part aligns smoothly."""},
+                 "content": f"""You are a highly precise and detail-oriented translation assistant specializing in subtitle translation. The '<<UNIQUE_SEPARATOR>>' markers are vital for separating different segments of the text, and it is absolutely critical that these markers are preserved exactly as they appear in the original. 
+                            Follow these specific instructions strictly:
+                                1. **Never modify or omit** any '<<UNIQUE_SEPARATOR>>' markers. The translated output **must have the exact same number of '<<UNIQUE_SEPARATOR>>' markers** as the original text.
+                                2. **Translate each segment independently**, ensuring that each part retains the context, and align the corresponding translated segments to the original.
+                                3. Ensure **each part is well-connected in meaning**, but always strictly respect the separation defined by '<<UNIQUE_SEPARATOR>>'.
+                                4. If reordering of content is necessary to ensure natural phrasing in the target language, make sure to re-order each segment accordingly while keeping the separator positions consistent.
+                                5. **Avoid splitting any phrases across segments**—each separated segment must remain independent and semantically intact.
+                                6. Do not add any extra '<<UNIQUE_SEPARATOR>>' markers at the end of the translated text, and make sure not to skip or lose any separators.
+                            Your output should aim for the most natural translation possible, while strictly adhering to these guidelines."""},
                 {"role": "user",
                  "content": f"Translate the following text from {source_language} to {target_language}: {combined_text}"}
             ]
