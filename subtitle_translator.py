@@ -96,15 +96,21 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
         if '<<UNIQUE_SEPARATOR>>' in combined_text:
             messages = [
                 {"role": "system",
-                 "content": f"""You are a highly precise and detail-oriented translation assistant specializing in subtitle translation. The '<<UNIQUE_SEPARATOR>>' markers are vital for separating different segments of the text, and it is absolutely critical that these markers are preserved exactly as they appear in the original. 
-                            Follow these specific instructions strictly:
-                                1. **Never modify or omit** any '<<UNIQUE_SEPARATOR>>' markers. The translated output **must have the exact same number of '<<UNIQUE_SEPARATOR>>' markers** as the original text.
-                                2. **Translate each segment independently**, ensuring that each part retains the context, and align the corresponding translated segments to the original.
-                                3. Ensure **each part is well-connected in meaning**, but always strictly respect the separation defined by '<<UNIQUE_SEPARATOR>>'.
-                                4. If reordering of content is necessary to ensure natural phrasing in the target language, make sure to re-order each segment accordingly while keeping the separator positions consistent.
-                                5. **Avoid splitting any phrases across segments**—each separated segment must remain independent and semantically intact.
-                                6. Do not add any extra '<<UNIQUE_SEPARATOR>>' markers at the end of the translated text, and make sure not to skip or lose any separators.
-                            Your output should aim for the most natural translation possible, while strictly adhering to these guidelines."""},
+                 "content": "You are a highly precise and detail-oriented translation assistant specializing in subtitle translation. The '<< UNIQUE_SEPARATOR >>' markers are vital for separating different segments of the text, and it is absolutely critical that these markers are preserved exactly as they appear in the original."
+                            "Follow these specific instructions strictly:"
+                                "1. **Never modify or omit** any '<< UNIQUE_SEPARATOR >>' markers. The translated output **must have the exact same number of '<< UNIQUE_SEPARATOR >>' markers** as the original text."
+                                "2. **Translate each segment independently**, ensuring that each part retains the context, and align the corresponding translated segments to the original."
+                                "3. Never respond with anything unrelated to the translation text or instructions; only reply with the translated content."
+                                "4. Ensure **each part is well-connected in meaning**, but always strictly respect the separation defined by '<< UNIQUE_SEPARATOR >>'."
+                                "5. If reordering of content is necessary to ensure natural phrasing in the target language, make sure to re-order each segment accordingly while keeping the separator positions consistent."
+                                "6. **Avoid splitting any phrases across segments**—each separated segment must remain independent and semantically intact."
+                                "7. Do not add any extra '<< UNIQUE_SEPARATOR >>' markers at the end of the translated text, and make sure not to skip or lose any '<< UNIQUE_SEPARATOR >>' marker."
+                                "Your output should aim for the most natural translation possible, while strictly adhering to these guidelines."
+                            "For example:"
+                                "Original text: Yeah, it is fascinating how quickly<< UNIQUE_SEPARATOR >>these narratives are forming,<< UNIQUE_SEPARATOR >>even though we're still so early in the process."
+                                "Incorrect translation: 这是译文这是译文<< UNIQUE_SEPARATOR >>这是译文这是译文。<< UNIQUE_SEPARATOR >>"
+                                "Correct translation: 这是译文这是译文<< UNIQUE_SEPARATOR >>这是译文这是译文<< UNIQUE_SEPARATOR >>这是译文这是译文。"
+                            ""},
                 {"role": "user",
                  "content": f"Translate the following text from {source_language} to {target_language}: {combined_text}"}
             ]
