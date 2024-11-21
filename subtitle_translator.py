@@ -10,10 +10,11 @@ from openai import OpenAI
 log_enabled = False
 warning_logs = []  # 存储警告信息
 empty_line_placeholder = "******"  # 默认替换空行的占位符
+current_ai = ""  # 定义 current_ai 变量
 
 # 读取配置文件
 def read_config(config_file='config.ini'):
-    global log_enabled, empty_line_placeholder
+    global log_enabled, empty_line_placeholder, current_ai
     config = configparser.ConfigParser()
 
     # 获取当前脚本所在的目录，并与配置文件名拼接出配置文件的绝对路径
@@ -63,7 +64,7 @@ def log(log_text, log_value=None):
 # 保存警告日志到文件
 def save_warnings(input_file):
     if warning_logs:
-        warning_file = os.path.splitext(input_file)[0] + "__翻译错误警告.txt"
+        warning_file = os.path.splitext(input_file)[0] + f"__翻译错误警告_{current_ai}.txt"
         with open(warning_file, 'w', encoding='utf-8') as f:
             for warning in warning_logs:
                 f.write(warning + "\n=================================\n")
@@ -123,8 +124,13 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
             ]
         else:
             messages = [
+                {"role": "system",
+                 "content": "You are a highly precise and detail-oriented translation assistant specializing in subtitle translation."
+                            "Never respond with anything unrelated to the translation text or instructions; only reply with the translated content."
+                            "Your output should aim for the most natural translation possible, while strictly adhering to these guidelines."
+                            ""},
                 {"role": "user",
-                 "content": f"Translate the following text from {source_language} to {target_language} in a natural and conversational tone suitable for subtitles. Ensure the translation preserves the emotional tone of the original and is easy to understand for a general audience.: {combined_text}"}
+                 "content": f"Translate the following text from {source_language} to {target_language}: {combined_text}"}
             ]
 
         translated_combined_text = call_openai_chat_completion(client, messages, model=model, temperature=temperature, max_retries=max_retries)
@@ -189,8 +195,8 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
             pbar.update(len(current_batch))
 
     # 生成输出文件名
-    output_bilingual_file = os.path.splitext(input_file)[0] + f"_combined_{source_language}_{target_language}.srt"
-    output_target_lang_file = os.path.splitext(input_file)[0] + f"_{target_language}.srt"
+    output_bilingual_file = os.path.splitext(input_file)[0] + f"_combined_{source_language}_{target_language}_{current_ai}.srt"
+    output_target_lang_file = os.path.splitext(input_file)[0] + f"_{target_language}_{current_ai}.srt"
 
     # 写入新的双语SRT文件
     with open(output_bilingual_file, 'w', encoding='utf-8') as f:
