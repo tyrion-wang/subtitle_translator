@@ -22,9 +22,11 @@ def read_config(config_file='config.ini'):
 
     # 如果配置文件不存在，创建默认配置文件
     if not os.path.exists(config_path):
-        config['openai'] = {'api_key': 'YOUR_OPENAI_API_KEY', 'model': 'gpt-4o', 'temperature': '0.3'}
-        config['srt'] = {'input_file': 'input_file.srt'}
-        config['settings'] = {'debug_mode': 'True', 'log_enabled': 'True', 'batch_size': '5', 'empty_line_placeholder': '******'}
+        config['settings'] = {'currentAI': 'openai', 'debug_mode': 'False', 'batch_size': '3', 'log_enabled': 'True', 'empty_line_placeholder': '******'}
+        config['srt'] = {'input_file': 'your_subtitle_file.srt'}
+        config['openai'] = {'api_key': 'openai_api_key', 'base_url': 'https://api.openai.com/v1', 'model': 'gpt-4o', 'temperature': '1.5'}
+        config['moonshot'] = {'api_key': 'moonshot_api_key', 'base_url': 'https://api.moonshot.cn/v1', 'model': 'moonshot-v1-auto', 'temperature': '0.75'}
+        config['ollama'] = {'api_key': 'my_ollama_api_key', 'base_url': 'http://0.0.0.0:4000', 'model': 'ollama/gemma2', 'temperature': '1.5'}
         with open(config_path, 'w', encoding='utf-8') as configfile:
             config.write(configfile)
         print(f"配置文件{config_file}已创建，请填写必要的配置信息后重新运行程序。")
@@ -33,16 +35,18 @@ def read_config(config_file='config.ini'):
     config.read(config_path)  # 读取配置文件
 
     # 读取配置项
-    api_key = config['openai']['api_key']
-    model = config['openai']['model']
-    temperature = config.getfloat('openai', 'temperature')
+    current_ai = config['settings']['currentAI']
+    api_key = config[current_ai]['api_key']
+    base_url = config[current_ai]['base_url']
+    model = config[current_ai]['model']
+    temperature = config.getfloat(current_ai, 'temperature')
     input_file = config['srt']['input_file']
     debug_mode = config.getboolean('settings', 'debug_mode')  # 转换为布尔值
     log_enabled = config.getboolean('settings', 'log_enabled')  # 读取日志开关
     batch_size = config.getint('settings', 'batch_size')  # 读取批次大小
     empty_line_placeholder = config['settings'].get('empty_line_placeholder', '******')  # 读取空行占位符
 
-    return api_key, model, temperature, input_file, debug_mode, batch_size
+    return api_key, base_url, model, temperature, input_file, debug_mode, batch_size
 
 # 设置OpenAI API密钥
 def setup_openai(api_key):
@@ -83,17 +87,20 @@ def call_openai_chat_completion(client, messages, model, max_tokens=8192, temper
     raise ValueError("请求重试多次后仍然失败，可能存在错误。")
 
 # 翻译函数
-def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False, model='gpt-4o', temperature=0.3, max_retries=3):
+def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False, model='gpt-4o', temperature=0.3, max_retries=3, api_key=None, base_url=None):
     if debug_mode:
         # 如果是调试模式，模拟API延迟并返回测试翻译结果
         time.sleep(0.5)  # 模拟延迟
         return [f"测试翻译：'{text}'" for text in texts]
     else:
         # 使用新的OpenAI接口进行翻译
-        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        combined_text = '<<UNIQUE_SEPARATOR>>'.join(texts)  # 将多行文本合并为一个字符串，使用特殊分割符
+        client = OpenAI(
+            api_key=api_key,
+            base_url=base_url
+        ) if api_key and base_url else None
+        combined_text = '<< UNIQUE_SEPARATOR >>'.join(texts)  # 将多行文本合并为一个字符串，使用特殊分割符
 
-        if '<<UNIQUE_SEPARATOR>>' in combined_text:
+        if '<< UNIQUE_SEPARATOR >>' in combined_text:
             messages = [
                 {"role": "system",
                  "content": "You are a highly precise and detail-oriented translation assistant specializing in subtitle translation. The '<< UNIQUE_SEPARATOR >>' markers are vital for separating different segments of the text, and it is absolutely critical that these markers are preserved exactly as they appear in the original."
@@ -121,7 +128,7 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
             ]
 
         translated_combined_text = call_openai_chat_completion(client, messages, model=model, temperature=temperature, max_retries=max_retries)
-        translated_texts = translated_combined_text.split('<<UNIQUE_SEPARATOR>>')
+        translated_texts = translated_combined_text.split('<< UNIQUE_SEPARATOR >>')
 
         # 检查翻译后的行数是否与原始行数一致，或者翻译结果是否为空字符串
         if len(translated_texts) != len(texts) or any(not text.strip() for text in translated_texts):
@@ -158,7 +165,7 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
                 i += 1
 
             original_texts = [subtitle.content for subtitle in current_batch]
-            translated_texts = translate_text_batch(original_texts, source_language=source_language, target_language=target_language, debug_mode=debug_mode, model=model, temperature=temperature)
+            translated_texts = translate_text_batch(original_texts, source_language=source_language, target_language=target_language, debug_mode=debug_mode, model=model, temperature=temperature, api_key=api_key, base_url=base_url)
 
             # 确保 translated_texts 的数量与 original_texts 一致
             if len(translated_texts) < len(original_texts):
@@ -201,7 +208,7 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
 # 主函数
 if __name__ == "__main__":
     # 读取配置文件
-    api_key, model, temperature, input_srt_file, debug_mode, batch_size = read_config('config.ini')
+    api_key, base_url, model, temperature, input_srt_file, debug_mode, batch_size = read_config('config.ini')
 
     # 设置OpenAI API密钥
     setup_openai(api_key)
