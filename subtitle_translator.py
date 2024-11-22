@@ -49,10 +49,6 @@ def read_config(config_file='config.ini'):
 
     return api_key, base_url, model, temperature, input_file, debug_mode, batch_size
 
-# 设置OpenAI API密钥
-def setup_openai(api_key):
-    os.environ['OPENAI_API_KEY'] = api_key
-
 # 日志打印函数
 def log(log_text, log_value=None):
     if log_enabled:
@@ -215,9 +211,6 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
 if __name__ == "__main__":
     # 读取配置文件
     api_key, base_url, model, temperature, input_srt_file, debug_mode, batch_size = read_config('config.ini')
-
-    # 设置OpenAI API密钥
-    setup_openai(api_key)
 
     # 调用函数进行字幕翻译
     output_bilingual_file, output_target_lang_file = translate_srt(input_srt_file, batch_size=batch_size, debug_mode=debug_mode, model=model, temperature=temperature)
