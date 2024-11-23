@@ -1,5 +1,6 @@
 import configparser
 import os
+from pathlib import Path
 
 class ConfigManager:
     _instance = None
@@ -7,18 +8,26 @@ class ConfigManager:
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(ConfigManager, cls).__new__(cls, *args, **kwargs)
-            cls._instance.initialize()
+            cls._instance._initialize()
         return cls._instance
 
-    def initialize(self, config_file='config.ini'):
+    def _initialize(self, config_file='config.ini'):
+        if hasattr(self, 'config'):
+            return  # 如果已经初始化过，直接返回
+
         self.config = configparser.ConfigParser()
 
-        # 获取当前脚本所在目录
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        self.config_path = os.path.join(script_dir, config_file)
+        # 尝试从环境变量获取配置路径
+        config_path = os.getenv('CONFIG_FILE_PATH', None)
+        if config_path:
+            self.config_path = Path(config_path)
+        else:
+            # 获取用户主目录下的配置目录
+            self.config_path = Path.home() / ".config" / "subtitle_translator" / config_file
+            self.config_path.parent.mkdir(parents=True, exist_ok=True)
 
         # 如果配置文件不存在，创建默认配置文件
-        if not os.path.exists(self.config_path):
+        if not self.config_path.exists():
             self.config['settings'] = {
                 'currentAI': 'openai',
                 'debug_mode': 'False',
@@ -33,9 +42,21 @@ class ConfigManager:
                 'model': 'gpt-4o',
                 'temperature': '1.5'
             }
+            self.config['moonshot'] = {
+                'api_key': 'moonshot_api_key',
+                'base_url': 'https://api.moonshot.cn/v1',
+                'model': 'moonshot-v1-auto',
+                'temperature': '0.75'
+            }
+            self.config['ollama'] = {
+                'api_key': 'ollama_api_key',
+                'base_url': 'http://0.0.0.0:4000',
+                'model': 'ollama/gemma2:27b',
+                'temperature': '1.5'
+            }
             with open(self.config_path, 'w', encoding='utf-8') as configfile:
                 self.config.write(configfile)
-            print(f"配置文件 {config_file} 已创建，请填写必要的配置信息后重新运行程序。")
+            print(f"配置文件 {self.config_path} 已创建，请填写必要的配置信息后重新运行程序。")
             exit(1)
 
         self.config.read(self.config_path)
@@ -54,18 +75,18 @@ class ConfigManager:
 
 def read_config(config_file='config.ini'):
     config_manager = ConfigManager()
-    config_manager.initialize(config_file)
+    config_manager._initialize(config_file)
     config = config_manager.config
 
-    current_ai = config['settings']['currentAI']
-    api_key = config[current_ai]['api_key']
-    base_url = config[current_ai]['base_url']
-    model = config[current_ai]['model']
+    current_ai = config_manager.get('settings', 'currentAI')
+    api_key = config_manager.get(current_ai, 'api_key')
+    base_url = config_manager.get(current_ai, 'base_url')
+    model = config_manager.get(current_ai, 'model')
     temperature = config_manager.getfloat(current_ai, 'temperature')
-    input_file = config['srt']['input_file']
+    input_file = config_manager.get('srt', 'input_file')
     debug_mode = config_manager.getboolean('settings', 'debug_mode')
     batch_size = config_manager.getint('settings', 'batch_size')
     log_enabled = config_manager.getboolean('settings', 'log_enabled')
-    empty_line_placeholder = config['settings'].get('empty_line_placeholder', '******')
+    empty_line_placeholder = config_manager.get('settings', 'empty_line_placeholder', '******')
 
     return api_key, base_url, model, temperature, input_file, debug_mode, batch_size, log_enabled, empty_line_placeholder
