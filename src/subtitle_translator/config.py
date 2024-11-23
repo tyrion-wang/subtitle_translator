@@ -35,7 +35,6 @@ class ConfigManager:
                 'log_enabled': 'True',
                 'empty_line_placeholder': '******'
             }
-            self.config['srt'] = {'input_file': 'your_subtitle_file.srt'}
             self.config['openai'] = {
                 'api_key': 'openai_api_key',
                 'base_url': 'https://api.openai.com/v1',
@@ -83,10 +82,9 @@ def read_config(config_file='config.ini'):
     base_url = config_manager.get(current_ai, 'base_url')
     model = config_manager.get(current_ai, 'model')
     temperature = config_manager.getfloat(current_ai, 'temperature')
-    input_file = config_manager.get('srt', 'input_file')
     debug_mode = config_manager.getboolean('settings', 'debug_mode')
     batch_size = config_manager.getint('settings', 'batch_size')
     log_enabled = config_manager.getboolean('settings', 'log_enabled')
     empty_line_placeholder = config_manager.get('settings', 'empty_line_placeholder', '******')
 
-    return api_key, base_url, model, temperature, input_file, debug_mode, batch_size, log_enabled, empty_line_placeholder
+    return api_key, base_url, model, temperature, debug_mode, batch_size, log_enabled, empty_line_placeholder
