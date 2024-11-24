@@ -1,6 +1,6 @@
 import openai
 from openai import OpenAI
-from src.subtitle_translator.logger import log
+from .logger import log
 from .config import ConfigManager
 
 current_ai = ConfigManager().get('settings', 'currentAI')

@@ -2,9 +2,10 @@ import srt
 from tqdm import tqdm
 from .logger import log
 from .openai_client import call_openai_chat_completion
-from config import ConfigManager
+from .config import ConfigManager
 import time
 import os
+
 warning_logs = []  # 存储警告信息
 empty_line_placeholder = "******"  # 默认替换空行的占位符
 current_ai = ConfigManager().get('settings', 'currentAI')  # 定义 current_ai 变量
