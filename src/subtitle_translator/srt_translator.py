@@ -1,10 +1,10 @@
 import srt
-from tqdm import tqdm
 from .logger import log
 from .openai_client import call_openai_chat_completion
 from .config import ConfigManager
 import time
 import os
+from rich.progress import Progress
 
 warning_logs = []  # 存储警告信息
 empty_line_placeholder = "******"  # 默认替换空行的占位符
@@ -81,7 +81,9 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
 
     i = 0
     # 使用tqdm来显示进度条
-    with tqdm(total=total_lines, desc="翻译进度", unit="行") as pbar:
+    with Progress() as progress:
+        task = progress.add_task(f"翻译进度：0/{total_lines}行", total=total_lines)
+
         while i < total_lines:
             current_batch = []
             current_length = 0
@@ -122,7 +124,7 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
                                                               content=translated_text)
                 translated_texts_only.append(translated_texts_only_subtitle)
 
-            pbar.update(len(current_batch))
+            progress.update(task, advance=len(current_batch), description=f"翻译进度：{i}/{total_lines}行")
 
     # 生成输出文件名
     output_bilingual_file = os.path.splitext(input_file)[
