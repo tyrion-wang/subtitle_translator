@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "subtitle_translator"
+name = "subtransAI"
 version = "0.1.0"
 description = "Python project using AI for subtitle translatio."
 readme = "README.rst"
@@ -62,4 +62,5 @@ allow_untyped_defs = true
 disable_error_code = "attr-defined"
 
 [project.scripts]
-subtitle-translator = "subtitle_translator.cli:app"
+subtransAI = "subtitle_translator.cli:app"
+subtransai = "subtitle_translator.cli:app"
