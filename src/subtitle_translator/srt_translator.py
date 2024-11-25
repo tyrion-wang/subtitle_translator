@@ -5,6 +5,9 @@ from .config import ConfigManager
 import time
 import os
 from rich.progress import Progress
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
 
 warning_logs = []  # 存储警告信息
 empty_line_placeholder = "******"  # 默认替换空行的占位符
@@ -18,11 +21,39 @@ def save_warnings(input_file):
             for warning in warning_logs:
                 f.write(warning + "\n=================================\n")
 
+def display_warning(texts, translated_texts):
+    """
+    用于显示翻译警告信息的函数。
+    """
+    console = Console()
+
+    # 构造逐行显示的文本内容
+    details = "\n".join(
+        f"原始文本: {original}\n翻译结果: {translated if translated.strip() else '（空白翻译）'}"
+        for original, translated in zip(texts, translated_texts)
+    )
+
+    # 创建警告框
+    warning_message = "翻译后的行数与原始行数不匹配或翻译结果为空，可能存在错误。"
+    panel = Panel.fit(
+        f"[yellow bold]Warning:[/yellow bold] {warning_message}\n\n{details}",
+        title="Warning",
+        title_align="left",
+        border_style="red",
+    )
+
+    # 输出警告
+    console.print(panel)
+
 # 翻译函数
 def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False, model='gpt-4o', temperature=0.3):
     if debug_mode:
         # 如果是调试模式，模拟API延迟并返回测试翻译结果
         time.sleep(0.5)  # 模拟延迟
+        # console = Console()
+        # console.print("123123")
+        # print("123123123")
+        display_warning(texts,texts)
         return [f"测试翻译：'{text}'" for text in texts]
     else:
         # 使用新的OpenAI接口进行翻译
