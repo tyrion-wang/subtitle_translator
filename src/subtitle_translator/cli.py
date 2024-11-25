@@ -1,8 +1,4 @@
 import typer
-# from src.subtitle_translator.config import read_config
-# from src.subtitle_translator.srt_translator import translate_srt
-# from src.subtitle_translator.logger import enable_logging
-
 from .config import read_config
 from .srt_translator import translate_srt
 from .logger import enable_logging
