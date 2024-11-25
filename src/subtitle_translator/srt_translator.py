@@ -16,7 +16,7 @@ current_ai = ConfigManager().get('settings', 'currentAI')  # 定义 current_ai �
 # 保存警告日志到文件
 def save_warnings(input_file):
     if warning_logs:
-        warning_file = os.path.splitext(input_file)[0] + f"__翻译错误警告_{current_ai}.txt"
+        warning_file = os.path.splitext(input_file)[0] + f"翻译错误警告_{current_ai}.txt"
         with open(warning_file, 'w', encoding='utf-8') as f:
             for warning in warning_logs:
                 f.write(warning + "\n=================================\n")
@@ -96,7 +96,7 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
 
         # 检查翻译后的行数是否与原始行数一致，或者翻译结果是否为空字符串
         if len(translated_texts) != len(texts) or any(not text.strip() for text in translated_texts):
-            warning_message = f"警告：翻译后的行数与原始行数不匹配或翻译结果为空，可能存在错误。\n原始文本：{texts}\n翻译结果：{translated_texts}"
+            warning_message = f"==================Warning=================\n翻译后的行数与原始行数不匹配或翻译结果为空，可能存在错误。\n原始文本：{texts}\n翻译结果：{translated_texts}"
             warning_logs.append(warning_message)
             log(warning_message)
         return translated_texts
