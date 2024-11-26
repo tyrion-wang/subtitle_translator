@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "subtransAI"
-version = "1.0.0"
-description = "Python project using AI for subtitle translatio."
+version = "1.0.1"
+description = "Python project using AI for subtitle translation."
 readme = "README.rst"
 authors = [
   {name = "Tyrion", email = "maple_leaf_7@msn.com"}
