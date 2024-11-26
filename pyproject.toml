@@ -18,7 +18,10 @@ classifiers = [
 ]
 license = {text = "MIT license"}
 dependencies = [
-  "typer"
+    "typer~=0.13.1",
+    "openai~=1.55.0",
+    "srt~=3.5.3",
+    "rich~=13.9.4",
 ]
 
 [project.optional-dependencies]
@@ -63,4 +66,3 @@ disable_error_code = "attr-defined"
 
 [project.scripts]
 subtransAI = "subtitle_translator.cli:app"
-subtransai = "subtitle_translator.cli:app"
