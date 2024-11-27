@@ -2,8 +2,20 @@ import typer
 from .config import read_config
 from .srt_translator import translate_srt
 from .logger import enable_logging
+from .location_utils.location import Location
 
 app = typer.Typer()
+
+# # 获取单例实例
+# localizer = Location()
+#
+# # 检测系统语言并设置
+# system_language = localizer.detect_system_language()
+# localizer.set_language(system_language)
+#
+# # 使用翻译函数
+# print(localizer.get_text("greeting").format(name="Tyrion"))
+# print(localizer.get_text("farewell").format(name="Tyrion"))
 
 @app.command()
 def main(
