@@ -14,10 +14,10 @@ class Location:
             cls._instance._initialized = False
         return cls._instance
 
-    def __init__(self, domain="messages"):
+    def __init__(self, domain="default"):
         """
         初始化本地化模块
-        :param domain: 翻译文件的域名（默认 "messages"）
+        :param domain: 翻译文件的域名（默认 "default"）
         """
         if not self._initialized:  # 确保只初始化一次
             self.domain = domain
