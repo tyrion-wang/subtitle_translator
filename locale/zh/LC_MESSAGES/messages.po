@@ -16,3 +16,6 @@ msgstr "你好，{name}！"
 
 msgid "farewell"
 msgstr "再见，{name}。"
+
+msgid "config-patch"
+msgstr "配置文件路径"

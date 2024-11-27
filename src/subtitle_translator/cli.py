@@ -6,21 +6,17 @@ from .location_utils.location import Location
 
 app = typer.Typer()
 
-# # 获取单例实例
-# localizer = Location()
-#
-# # 检测系统语言并设置
-# system_language = localizer.detect_system_language()
-# localizer.set_language(system_language)
-#
-# # 使用翻译函数
-# print(localizer.get_text("greeting").format(name="Tyrion"))
-# print(localizer.get_text("farewell").format(name="Tyrion"))
+# 获取单例实例
+localizer = Location()
+# 检测系统语言并设置
+system_language = localizer.detect_system_language()
+localizer.set_language(system_language)
+# localizer.set_language("en")
 
 @app.command()
 def main(
     input_file: str,  # 必填参数：输入的字幕文件路径
-    config_file: str = typer.Option("config.ini", help="配置文件路径"),  # 可选参数，带默认值
+    config_file: str = typer.Option("config.ini", help=localizer.get_text("config-patch")),  # 可选参数，带默认值
     target_language: str = typer.Option("zh", help="目标语言，默认为中文")  # 新增参数，默认为中文
 ):
     """

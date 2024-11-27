@@ -16,3 +16,6 @@ msgstr "Hello, {name}!"
 
 msgid "farewell"
 msgstr "Goodbye, {name}."
+
+msgid "config-patch"
+msgstr "Configuration file path"
