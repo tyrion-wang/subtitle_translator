@@ -11,11 +11,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "greeting"
-msgstr "Hello, {name}!"
-
-msgid "farewell"
-msgstr "Goodbye, {name}."
-
 msgid "config-patch"
 msgstr "Configuration file path"
+
+msgid "config-default-is-zh"
+msgstr "Target language, default is Chinese"
+
+msgid "output-bilingual-sub"
+msgstr "Bilingual subtitle translation completed, output file: {file}"
+
+msgid "output-single-sub"
+msgstr "Single-language subtitle translation completed, output file: {file}"

@@ -11,11 +11,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "greeting"
-msgstr "你好，{name}！"
-
-msgid "farewell"
-msgstr "再见，{name}。"
-
 msgid "config-patch"
 msgstr "配置文件路径"
+
+msgid "config-default-is-zh"
+msgstr "目标语言，默认为中文"
+
+msgid "output-bilingual-sub"
+msgstr "双语字幕翻译完成，输出文件：{file}"
+
+msgid "output-single-sub"
+msgstr "单语字幕翻译完成，输出文件：{file}"
