@@ -15,10 +15,19 @@ msgid "config-patch"
 msgstr "Configuration file path"
 
 msgid "config-default-is-zh"
-msgstr "Target language, default is Chinese"
+msgstr "Target language, default is Chinese123"
 
 msgid "output-bilingual-sub"
-msgstr "Bilingual subtitle translation completed, output file: {file}"
+msgstr "Bilingual subtitle translation completed, output file:{file}"
 
 msgid "output-single-sub"
-msgstr "Single-language subtitle translation completed, output file: {file}"
+msgstr "Single-language subtitle translation completed, output file:{file}"
+
+msgid "config-creation-completed"
+msgstr "Configuration file {path} has been created. Please fill in the required configuration information and rerun the program."
+
+msgid "translation-progress-0"
+msgstr "Translation progress: 0/{total} lines"
+
+msgid "translation-progress-current"
+msgstr "Translation progress: {current}/{total} lines"

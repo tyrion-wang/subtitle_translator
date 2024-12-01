@@ -8,6 +8,7 @@ from rich.progress import Progress
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
+from .location_utils.location import _
 
 warning_logs = []  # 存储警告信息
 empty_line_placeholder = "******"  # 默认替换空行的占位符
@@ -113,7 +114,7 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
     i = 0
     # 使用tqdm来显示进度条
     with Progress() as progress:
-        task = progress.add_task(f"翻译进度：0/{total_lines}行", total=total_lines)
+        task = progress.add_task(_("translation-progress-0").format(total=total_lines), total=total_lines)
 
         while i < total_lines:
             current_batch = []
@@ -155,7 +156,7 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
                                                               content=translated_text)
                 translated_texts_only.append(translated_texts_only_subtitle)
 
-            progress.update(task, advance=len(current_batch), description=f"翻译进度：{i}/{total_lines}行")
+            progress.update(task, advance=len(current_batch), description=_("translation-progress-current").format(current=i,total=total_lines))
 
     # 生成输出文件名
     output_bilingual_file = os.path.splitext(input_file)[

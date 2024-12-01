@@ -2,18 +2,17 @@ import typer
 from .config import read_config
 from .srt_translator import translate_srt
 from .logger import enable_logging
-from .location_utils.location import Location
+# from .location_utils.location import Location
+from .location_utils.location import detect_system_language, set_language, _
 
 app = typer.Typer()
 
-# 获取单例实例
-localizer = Location()
-# 检测系统语言并设置
-system_language = localizer.detect_system_language()
-localizer.set_language(system_language)
-_ = localizer.get_text
 
-# localizer.set_language("en")
+# 检测系统语言并设置
+set_language(detect_system_language())
+# set_language("en")
+
+
 
 @app.command()
 def main(

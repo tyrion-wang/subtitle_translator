@@ -22,3 +22,12 @@ msgstr "双语字幕翻译完成，输出文件：{file}"
 
 msgid "output-single-sub"
 msgstr "单语字幕翻译完成，输出文件：{file}"
+
+msgid "config-creation-completed"
+msgstr "配置文件{path}已创建，请填写必要的配置信息后重新运行程序。"
+
+msgid "translation-progress-0"
+msgstr "翻译进度：0/{total}行"
+
+msgid "translation-progress-current"
+msgstr "翻译进度：{current}/{total}行"

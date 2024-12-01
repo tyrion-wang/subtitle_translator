@@ -63,3 +63,15 @@ class Location:
         :return: 翻译后的字符串
         """
         return self.translation.gettext(message) if self.translation else message
+
+localizer = Location()
+detect_system_language = localizer.detect_system_language
+load_translation = localizer.load_translation
+set_language = localizer.set_language
+_ = localizer.get_text
+# globals()['detect_system_language'] = localizer.detect_system_language
+# globals()['load_translation'] = localizer.load_translation
+# globals()['set_language'] = localizer.set_language
+# globals()['get_text'] = localizer.get_text
+
+

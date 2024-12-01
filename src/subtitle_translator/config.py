@@ -1,6 +1,10 @@
 import configparser
 import os
 from pathlib import Path
+from .location_utils.location import set_language, detect_system_language, _
+
+# 检测系统语言并设置
+set_language(detect_system_language())
 
 class ConfigManager:
     _instance = None
@@ -55,7 +59,7 @@ class ConfigManager:
             }
             with open(self.config_path, 'w', encoding='utf-8') as configfile:
                 self.config.write(configfile)
-            print(f"配置文件 {self.config_path} 已创建，请填写必要的配置信息后重新运行程序。")
+            print(_("config-creation-completed").format(path=self.config_path))
             exit(1)
 
         self.config.read(self.config_path)
