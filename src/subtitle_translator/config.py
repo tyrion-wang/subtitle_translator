@@ -1,10 +1,7 @@
 import configparser
 import os
 from pathlib import Path
-from .location_utils.location import set_language, detect_system_language, _
-
-# 检测系统语言并设置
-set_language(detect_system_language())
+from .location_utils.location import _
 
 class ConfigManager:
     _instance = None

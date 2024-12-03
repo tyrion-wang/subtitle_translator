@@ -3,16 +3,9 @@ from .config import read_config
 from .srt_translator import translate_srt
 from .logger import enable_logging
 # from .location_utils.location import Location
-from .location_utils.location import detect_system_language, set_language, _
+from .location_utils.location import _
 
 app = typer.Typer()
-
-
-# 检测系统语言并设置
-set_language(detect_system_language())
-# set_language("en")
-
-
 
 @app.command()
 def main(
