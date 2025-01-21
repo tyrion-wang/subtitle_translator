@@ -77,6 +77,16 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
                                 "Original text: Yeah, it is fascinating how quickly<< UNIQUE_SEPARATOR >>these narratives are forming,<< UNIQUE_SEPARATOR >>even though we're still so early in the process."
                                 "Incorrect translation: 这是译文这是译文<< UNIQUE_SEPARATOR >>这是译文这是译文。<< UNIQUE_SEPARATOR >>"
                                 "Correct translation: 这是译文这是译文<< UNIQUE_SEPARATOR >>这是译文这是译文<< UNIQUE_SEPARATOR >>这是译文这是译文。"
+                            # "翻译要求："
+                            #     "1. 省略无关词汇：字幕中包含一些插入语、语气词等不需要翻译的内容（例如：you know, like, well等），这些应当省略，不影响整体对话流畅性。"
+                            #     "2. 俚语与隐喻：注意原文中的俚语、隐喻等表达。对于这些表达，避免直接逐字翻译，应根据上下文语境进行意译，必要时可以使用与中文文化相符的常见俚语或比喻替代。"
+                            #     "3. 口语化、自然化：翻译应尽量避免机械、僵硬的语言，考虑对话的语境，使其更加口语化、自然，符合中文观众的理解习惯。例如，若对话较为亲切或轻松，应避免过于正式或生硬的翻译。"
+                            #     "4. 角色性格与语境：根据对话的语境和角色个性，灵活调整翻译风格。例如，年轻角色的对话可以更具活力和随意性，年长角色则可以使用较正式、稳重的语言。"
+                            "Translation Requirements:"
+                                "1. Omit Irrelevant Words: Subtitles may contain filler words, interjections, or expressions (such as 'you know', 'like', 'well', etc.) that do not need translation. These should be omitted to maintain the overall flow of the dialogue."
+                                "2. Slang and Metaphors: Pay attention to slang, metaphors, and other idiomatic expressions in the original text. Instead of translating them literally, please paraphrase based on the context. If necessary, use common Chinese slang or metaphors that match the cultural context."
+                                "3. Conversational and Natural: The translation should avoid mechanical, stiff language. Consider the context of the conversation to make the dialogue more colloquial and natural, in line with how Chinese audiences would understand it. For example, if the dialogue is casual or friendly, avoid overly formal or rigid translations."
+                                "4. Character Personality and Context: Adjust the translation style based on the context of the conversation and the character's personality. For instance, dialogue from younger characters can be more energetic and casual, while older characters may use a more formal, composed language style."
                             ""},
                 {"role": "user",
                  "content": f"Translate the following text from {source_language} to {target_language}: {combined_text}"}
