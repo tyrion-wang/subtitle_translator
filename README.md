@@ -12,17 +12,19 @@ SubtransAI 是一个基于AI的字幕翻译工具，支持将SRT格式字幕文�
 - ⚙️ 灵活的配置选项
 
 ## 安装
-bash
+```bash
 pip install subtransAI
+```
 
 ## 快速开始
 
 1. 首次运行会在用户目录下创建配置文件:
-bash
+```bash
 ~/.config/subtitle_translator/config.ini
+```
 
 2. 编辑配置文件，设置AI服务参数:
-
+```ini
 [settings]
 currentAI = openai  # 可选: openai, moonshot, ollama
 
@@ -31,15 +33,18 @@ api_key = your_api_key
 base_url = https://api.openai.com/v1
 model = gpt-4
 temperature = 0.3
+```
 
 3. 运行翻译:
-bash
+```bash
 subtransAI input.srt
+```
 
 ## 命令行参数
 
-bash
+```bash
 subtransAI [OPTIONS] [INPUT_FILE]
+```
 
 参数:
   INPUT_FILE               输入的SRT文件路径
@@ -52,6 +57,7 @@ subtransAI [OPTIONS] [INPUT_FILE]
 
 配置文件支持以下选项:
 
+```ini
 [settings]
 currentAI = openai        # 当前使用的AI服务
 debug_mode = False        # 调试模式
@@ -64,6 +70,7 @@ api_key = your_api_key   # API密钥
 base_url = api_base_url  # API基础URL
 model = model_name       # 使用的模型
 temperature = 0.3        # 温度参数
+```
 
 ## 输出文件
 
@@ -74,16 +81,19 @@ temperature = 0.3        # 温度参数
 ## 开发
 
 1. 克隆仓库:
-bash
+```bash
 git clone https://github.com/tyrion-wang/subtitle_translator.git
+``` 
 
 2. 安装开发依赖:
-bash
+```bash
 pip install -e ".[dev]"
+```
 
 3. 生成翻译文件:
-bash
+```bash
 ./generate_mo.sh
+```
 
 ## 许可证
 
