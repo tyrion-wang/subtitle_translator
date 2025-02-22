@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8725542b-5091-4401-8a80-21cab9d425b7" name="Changes" comment="优化：增加获取配置文件地址的方法">
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-    </list>
+    <list default="true" id="8725542b-5091-4401-8a80-21cab9d425b7" name="Changes" comment="优化：增加获取配置文件地址的方法" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,8 +35,11 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Python.config-path.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/bytedance/workspace/OpenAI/subtitle_translator&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -52,6 +53,7 @@
   <component name="RunManager" selected="Python.test">
     <configuration name="config-path" type="PythonConfigurationType" factoryName="Python">
       <module name="subtitle_translator" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -75,6 +77,7 @@
     </configuration>
     <configuration name="test" type="PythonConfigurationType" factoryName="Python">
       <module name="subtitle_translator" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -248,10 +251,15 @@
     <MESSAGE value="增加多语言模块，支持了cli中的多语言翻译" />
     <MESSAGE value="优化：调整了本地化模块的运行时序" />
     <MESSAGE value="优化：增加获取配置文件地址的方法" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化：增加获取配置文件地址的方法" />
+    <MESSAGE value="改进：&#10;1. 优化了翻译prompt" />
+    <option name="LAST_COMMIT_MESSAGE" value="改进：&#10;1. 优化了翻译prompt" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/subtitle_translator$help.coverage" NAME="config-path Coverage Results" MODIFIED="1739876199343" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/subtitle_translator$test.coverage" NAME="test Coverage Results" MODIFIED="1739875418224" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/subtitle_translator$test.coverage" NAME="test 覆盖结果" MODIFIED="1740206814132" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/subtitle_translator$help.coverage" NAME="help 覆盖结果" MODIFIED="1733239562746" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/subtitle_translator$cli.coverage" NAME="cli 覆盖结果" MODIFIED="1732291945454" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Downloads/subtitle_translator/src/subtitle_translator" />
+    <SUITE FILE_PATH="coverage/subtitle_translator$translator.coverage" NAME="translator 覆盖结果" MODIFIED="1738172795344" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/subtitle_translator$subtitle_translator.coverage" NAME="subtitle_translator 覆盖结果" MODIFIED="1732291122726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/subtitle_translator$config_path.coverage" NAME="config-path 覆盖结果" MODIFIED="1740206808566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
