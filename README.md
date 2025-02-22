@@ -44,7 +44,6 @@ subtransAI input.srt
 
 ```bash
 subtransAI [OPTIONS] [INPUT_FILE]
-```
 
 参数:
   INPUT_FILE               输入的SRT文件路径
@@ -52,7 +51,7 @@ subtransAI [OPTIONS] [INPUT_FILE]
   --target-language TEXT  目标语言 [默认: zh]
   --config-path          显示配置文件路径
   --help                 显示帮助信息
-
+```
 ## 配置文件说明
 
 配置文件支持以下选项:
