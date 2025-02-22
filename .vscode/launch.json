@@ -1,0 +1,34 @@
+// .vscode/launch.json
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "--config-path",
+            "type": "python",
+            "request": "launch",
+            // 以模块方式执行：相当于 `python -m subtitle_translator.cli`
+            "module": "subtitle_translator.cli",
+            // 这里传参，比如 --config-path XXX
+            "args": [
+                "--config-path"
+            ],
+            "cwd": "${workspaceFolder}", // (可选) 指定工作目录，一般为项目根目录
+            "console": "integratedTerminal", // (可选) 指定在 VSCode 终端中输出调试日志
+            "justMyCode": true
+        },
+        {
+            "name": "subtitle_trans",
+            "type": "python",
+            "request": "launch",
+            "module": "subtitle_translator.cli",
+            "args": [
+                "/Users/bytedance/Downloads/test.srt"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+
+    ]
+}

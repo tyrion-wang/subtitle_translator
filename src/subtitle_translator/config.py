@@ -73,6 +73,9 @@ class ConfigManager:
     def getfloat(self, section, option, fallback=None):
         return self.config.getfloat(section, option, fallback=fallback)
 
+    def get_config_path(self):
+        return str(self.config_path)
+
 def read_config(config_file='config.ini'):
     config_manager = ConfigManager()
     config_manager._initialize(config_file)
