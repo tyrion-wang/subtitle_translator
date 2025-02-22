@@ -26,7 +26,7 @@ pip install subtransAI
 2. 编辑配置文件，设置AI服务参数:
 ```ini
 [settings]
-currentAI = openai  # 可选: openai, moonshot, ollama
+currentAI = openai  # 可选: Grok、Deepseek、Openai、Moonshot、Ollama 等基于OpenAI api的大模型接口
 
 [openai]
 api_key = your_api_key
