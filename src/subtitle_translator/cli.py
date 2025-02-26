@@ -27,7 +27,7 @@ def main(
         return
 
     # 从配置文件读取配置项
-    api_key, base_url, model, temperature, debug_mode, batch_size, log_enabled, empty_line_placeholder = read_config(config_file)
+    api_key, base_url, model, temperature, debug_mode, batch_size, log_enabled, empty_line_placeholder, max_tokens = read_config(config_file)
     enable_logging(log_enabled)
 
     # 翻译字幕，传入 target_language 参数
@@ -37,7 +37,8 @@ def main(
         debug_mode=debug_mode,
         model=model,
         temperature=temperature,
-        target_language=target_language  # 传入目标语言
+        target_language=target_language,
+        max_tokens=max_tokens  # 传入 max_tokens
     )
     typer.echo(_("output-bilingual-sub").format(file=output_bilingual_file))
     typer.echo(_("output-single-sub").format(file=output_bilingual_file))

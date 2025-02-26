@@ -40,19 +40,22 @@ class ConfigManager:
                 'api_key': 'openai_api_key',
                 'base_url': 'https://api.openai.com/v1',
                 'model': 'gpt-4o',
-                'temperature': '1.5'
+                'temperature': '1.5',
+                'max_tokens': '8192'
             }
             self.config['moonshot'] = {
                 'api_key': 'moonshot_api_key',
                 'base_url': 'https://api.moonshot.cn/v1',
                 'model': 'moonshot-v1-auto',
-                'temperature': '0.75'
+                'temperature': '0.75',
+                'max_tokens': '8192'
             }
             self.config['ollama'] = {
                 'api_key': 'ollama_api_key',
                 'base_url': 'http://0.0.0.0:4000',
                 'model': 'ollama/gemma2:27b',
-                'temperature': '1.5'
+                'temperature': '1.5',
+                'max_tokens': '8192'
             }
             with open(self.config_path, 'w', encoding='utf-8') as configfile:
                 self.config.write(configfile)
@@ -90,5 +93,6 @@ def read_config(config_file='config.ini'):
     batch_size = config_manager.getint('settings', 'batch_size')
     log_enabled = config_manager.getboolean('settings', 'log_enabled')
     empty_line_placeholder = config_manager.get('settings', 'empty_line_placeholder', '******')
+    max_tokens = config_manager.getint(current_ai, 'max_tokens', fallback=8192)
 
-    return api_key, base_url, model, temperature, debug_mode, batch_size, log_enabled, empty_line_placeholder
+    return api_key, base_url, model, temperature, debug_mode, batch_size, log_enabled, empty_line_placeholder, max_tokens

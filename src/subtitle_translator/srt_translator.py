@@ -47,7 +47,7 @@ def display_warning(texts, translated_texts):
     console.print(panel)
 
 # 翻译函数
-def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False, model='gpt-4o', temperature=0.3):
+def translate_text_batch(texts, source_language='en', target_language='zh', debug_mode=False, model='gpt-4o', temperature=0.3, max_tokens=8192):
     if debug_mode:
         # 如果是调试模式，模拟API延迟并返回测试翻译结果
         time.sleep(0.5)  # 模拟延迟
@@ -102,7 +102,7 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
                  "content": f"Translate the following text from {source_language} to {target_language}: {combined_text}"}
             ]
 
-        translated_combined_text = call_openai_chat_completion(messages, model=model, temperature=temperature)
+        translated_combined_text = call_openai_chat_completion(messages, model=model, temperature=temperature, max_tokens=max_tokens)
         translated_texts = translated_combined_text.split('<< UNIQUE_SEPARATOR >>')
 
         # 检查翻译后的行数是否与原始行数一致，或者翻译结果是否为空字符串
@@ -113,7 +113,7 @@ def translate_text_batch(texts, source_language='en', target_language='zh', debu
         return translated_texts
 
 
-def translate_srt(input_file, source_language='en', target_language='zh', batch_size=5, debug_mode=False, model='gpt-4o', temperature=0.3):
+def translate_srt(input_file, source_language='en', target_language='zh', batch_size=5, debug_mode=False, model='gpt-4o', temperature=0.3, max_tokens=8192):
     with open(input_file, 'r', encoding='utf-8') as f:
         srt_data = list(srt.parse(f.read()))  # 转为列表，方便后续处理
 
@@ -144,7 +144,7 @@ def translate_srt(input_file, source_language='en', target_language='zh', batch_
             original_texts = [subtitle.content for subtitle in current_batch]
             translated_texts = translate_text_batch(original_texts, source_language=source_language,
                                                     target_language=target_language, debug_mode=debug_mode, model=model,
-                                                    temperature=temperature)
+                                                    temperature=temperature, max_tokens=max_tokens)
 
             # 确保 translated_texts 的数量与 original_texts 一致
             if len(translated_texts) < len(original_texts):
