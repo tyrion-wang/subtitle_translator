@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8725542b-5091-4401-8a80-21cab9d425b7" name="Changes" comment="优化：增加获取配置文件地址的方法">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="8725542b-5091-4401-8a80-21cab9d425b7" name="Changes" comment="优化：对于每个大模型增加max_tokens的配置，提高对各个平台的兼容性。">
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,6 +120,7 @@
       <workItem from="1737445523382" duration="28000" />
       <workItem from="1739869715710" duration="3708000" />
       <workItem from="1739881257372" duration="48000" />
+      <workItem from="1740544876755" duration="152000" />
     </task>
     <task id="LOCAL-00001" summary="修改了Pycharm的配置，将src视为顶级包，支持相对导入">
       <created>1732510215245</created>
@@ -219,7 +220,14 @@
       <option name="project" value="LOCAL" />
       <updated>1739876227461</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="优化：对于每个大模型增加max_tokens的配置，提高对各个平台的兼容性。">
+      <created>1740544922852</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1740544922852</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -248,7 +256,8 @@
     <MESSAGE value="增加多语言模块，支持了cli中的多语言翻译" />
     <MESSAGE value="优化：调整了本地化模块的运行时序" />
     <MESSAGE value="优化：增加获取配置文件地址的方法" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化：增加获取配置文件地址的方法" />
+    <MESSAGE value="优化：对于每个大模型增加max_tokens的配置，提高对各个平台的兼容性。" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化：对于每个大模型增加max_tokens的配置，提高对各个平台的兼容性。" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/subtitle_translator$help.coverage" NAME="config-path Coverage Results" MODIFIED="1739876199343" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
